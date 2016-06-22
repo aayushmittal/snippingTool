@@ -15,17 +15,26 @@ import javax.swing.*;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
+import java.awt.image.RescaleOp;
 public class SelectionFrame extends JFrame {
 	private JButton capture;
 	private JButton captureNew;
+	JScrollPane sp;
 	private JButton cancel;
 	private JButton save;
+	private JButton addC;
+	private JButton addB;
+	private JButton removeC;
+	private JButton removeB;
 	private ImageIcon image;
 	private JPanel imageArea;
 	private JPanel buttonArea;
 	private JComboBox dropDownMenu;
 	private int optionSelected;
 	private static String[] list = {"Fullscreen","Custom"}; 	
+	private float contrastValue = 1.0f;
+	private float brightnessValue = 1.0f;
+	RescaleOp rescale;
 	public SelectionFrame(ImageIcon imageIcon) {
 		super("Snipping Tool");
 		setLayout(new FlowLayout());
@@ -79,7 +88,130 @@ public class SelectionFrame extends JFrame {
 		else if(imageIcon != null){
 			//Image is captured
 			setExtendedState(JFrame.MAXIMIZED_BOTH);
+			addB = new JButton("+Brightness");
+			addC = new JButton("+Contrast");
+			removeB = new JButton("-Brightness");
+			removeC = new JButton("-Contrast");
 			captureNew = new JButton("Capture New");
+			addB.addActionListener(new ActionListener() {
+				
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					brightnessValue += 5.0f;
+					rescale = new RescaleOp(contrastValue,brightnessValue,null);
+					BufferedImage bi = new BufferedImage(
+					    image.getIconWidth(),
+					    image.getIconHeight(),
+					    BufferedImage.TYPE_INT_RGB);
+					Graphics g = bi.createGraphics();
+					// paint the Icon to the BufferedImage.
+					imageIcon.paintIcon(null, g, 0,0);
+					g.dispose();
+					
+					bi = rescale.filter(bi,null);
+					//try{
+					// Thread.sleep(500); //Time given so that current window is hidden before going furthur
+					// }catch(InterruptedException ex) {
+					// 	Thread.currentThread().interrupt();
+					// }
+					image = new ImageIcon(bi);
+					remove(sp);
+					sp = new JScrollPane(new JLabel(image));
+					add(sp,BorderLayout.CENTER);
+					//setVisible(false);
+					setVisible(true);
+				}
+			});
+			addC.addActionListener(new ActionListener() {
+				
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					contrastValue += 0.05f;
+					rescale = new RescaleOp(contrastValue,brightnessValue,null);
+					BufferedImage bi = new BufferedImage(
+					    image.getIconWidth(),
+					    image.getIconHeight(),
+					    BufferedImage.TYPE_INT_RGB);
+					Graphics g = bi.createGraphics();
+					// paint the Icon to the BufferedImage.
+					imageIcon.paintIcon(null, g, 0,0);
+					g.dispose();
+					
+					bi = rescale.filter(bi,null);
+					// try{
+					// Thread.sleep(500); //Time given so that current window is hidden before going furthur
+					// }catch(InterruptedException ex) {
+					// 	Thread.currentThread().interrupt();
+					// }
+					image = new ImageIcon(bi);
+					remove(sp);
+					sp = new JScrollPane(new JLabel(image));
+					add(sp,BorderLayout.CENTER);
+					//setVisible(false);
+					setVisible(true);
+					
+				}
+			});
+			removeB.addActionListener(new ActionListener() {
+				
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					brightnessValue -= 5.0f;
+					rescale = new RescaleOp(contrastValue,brightnessValue,null);
+					BufferedImage bi = new BufferedImage(
+					    image.getIconWidth(),
+					    image.getIconHeight(),
+					    BufferedImage.TYPE_INT_RGB);
+					Graphics g = bi.createGraphics();
+					// paint the Icon to the BufferedImage.
+					imageIcon.paintIcon(null, g, 0,0);
+					g.dispose();
+					
+					bi = rescale.filter(bi,null);
+					// try{
+					// Thread.sleep(500); //Time given so that current window is hidden before going furthur
+					// }catch(InterruptedException ex) {
+					// 	Thread.currentThread().interrupt();
+					// }
+					image = new ImageIcon(bi);
+					remove(sp);
+					sp = new JScrollPane(new JLabel(image));
+					add(sp,BorderLayout.CENTER);
+					//setVisible(false);
+					setVisible(true);
+				}
+			});
+			removeC.addActionListener(new ActionListener() {
+				
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					contrastValue -= 0.05f;
+					rescale = new RescaleOp(contrastValue,brightnessValue,null);
+					BufferedImage bi = new BufferedImage(
+					    image.getIconWidth(),
+					    image.getIconHeight(),
+					    BufferedImage.TYPE_INT_RGB);
+					Graphics g = bi.createGraphics();
+					// paint the Icon to the BufferedImage.
+					imageIcon.paintIcon(null, g, 0,0);
+					g.dispose();
+					
+					bi = rescale.filter(bi,null);
+					// try{
+					// Thread.sleep(500); //Time given so that current window is hidden before going furthur
+					// }catch(InterruptedException ex) {
+					// 	Thread.currentThread().interrupt();
+					// }
+					image = new ImageIcon(bi);
+					remove(sp);
+					sp = new JScrollPane(new JLabel(image));
+					add(sp,BorderLayout.CENTER);
+					//setVisible(false);
+					setVisible(true);
+					
+				}
+			});
+
 			//If the captured image is to be discarded for a new capture
 			captureNew.addActionListener(new ActionListener() {
 				
@@ -111,7 +243,7 @@ public class SelectionFrame extends JFrame {
 				public void actionPerformed(ActionEvent e) {
 					// TODO Auto-generated method stub
 					//save image
-					ImageIcon imgIcon = imageIcon;
+					ImageIcon imgIcon = image;
 					JFileChooser fileChooser = new JFileChooser(); //To open location browser
 					fileChooser.setDialogTitle("Select a directory to save image");
 					fileChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
@@ -151,10 +283,14 @@ public class SelectionFrame extends JFrame {
 			buttonArea.add(captureNew,BorderLayout.WEST);
 			buttonArea.add(save,BorderLayout.CENTER);
 			buttonArea.add(cancel,BorderLayout.EAST);
+			buttonArea.add(addB,BorderLayout.EAST);
+			buttonArea.add(addC,BorderLayout.WEST);
+			buttonArea.add(removeB,BorderLayout.EAST);
+			buttonArea.add(removeC,BorderLayout.WEST);
 			//add all three buttons for user to choose functionality
 			imageArea.setPreferredSize(new Dimension(image.getIconWidth(),image.getIconHeight()));
 			//Set size
-			JScrollPane sp = new JScrollPane(new JLabel(image));
+			 sp = new JScrollPane(new JLabel(image));
 			//make it scroll bar
 			Dimension dimen = new Dimension(Toolkit.getDefaultToolkit().getScreenSize());
 			dimen.setSize(dimen.getWidth(), dimen.getHeight()-100);

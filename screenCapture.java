@@ -14,6 +14,7 @@ import javax.swing.JFrame;
 import javax.swing.*;
 import javax.swing.event.*;
 public class screenCapture extends JFrame{	
+
 	private JLabel mousepanel ;
 	private JLabel statusbar;
 	private ImageIcon imageicon;
